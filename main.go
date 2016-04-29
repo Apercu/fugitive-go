@@ -7,7 +7,6 @@ import (
   "strings"
   "regexp"
   "net/http"
-  "encoding/json"
   "gopkg.in/mgo.v2"
   "gopkg.in/mgo.v2/bson"
 )
@@ -53,11 +52,8 @@ func get (w http.ResponseWriter, r * http.Request) {
  * Link creation
  */
 func post (w http.ResponseWriter, r * http.Request) {
-  decoder := json.NewDecoder(r.Body)
-  var b Body
-  err := decoder.Decode(&b)
-  if (err != nil) { panic(err) }
-  if (strings.Index(b.Dst, "http://") != 0 && strings.Index(b.Dst, "https://") != 0) {
+  dst := r.FormValue("dst")
+  if (strings.Index(dst, "http://") != 0 && strings.Index(dst, "https://") != 0) {
     sendError(w, http.StatusBadRequest)
     return
   }
@@ -65,7 +61,7 @@ func post (w http.ResponseWriter, r * http.Request) {
   var id bson.ObjectId = bson.NewObjectId()
   var hex string = id.Hex()
   hex = hex[len(hex) - 7:]
-  err = c.Insert(&Link{ Src: hex, Dst: b.Dst, Id: id })
+  err := c.Insert(&Link{ Src: hex, Dst: dst, Id: id })
   if (err != nil) { panic(err) }
   w.Write([]byte(hex))
 }
@@ -92,6 +88,9 @@ func main () {
   c = mongo.DB("fugitive").C("links")
 
   http.HandleFunc("/", func (w http.ResponseWriter, r * http.Request) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+    w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
+
     if (r.Method == "GET") { get(w, r) }
     if (r.Method == "POST") { post(w, r) }
   })
