@@ -28,6 +28,9 @@ func sendError (w http.ResponseWriter, t int) {
   http.Error(w, http.StatusText(t), t)
 }
 
+/**
+ * Link retrieve with redirect
+ */
 func get (w http.ResponseWriter, r * http.Request) {
   var id string = strings.TrimLeft(html.EscapeString(r.URL.Path), "/")
   match, _ := regexp.MatchString("^[A-Za-z0-9]*$", id)
@@ -46,6 +49,9 @@ func get (w http.ResponseWriter, r * http.Request) {
   http.Redirect(w, r, result.Dst, 301)
 }
 
+/**
+ * Link creation
+ */
 func post (w http.ResponseWriter, r * http.Request) {
   decoder := json.NewDecoder(r.Body)
   var b Body
@@ -73,6 +79,9 @@ func port () string {
   return ":3000"
 }
 
+/**
+ * Connect to mongo and set global collection variable
+ */
 func main () {
   mongo, err := mgo.Dial(os.Getenv("MONGO"))
   if (err != nil) { panic(err) }
