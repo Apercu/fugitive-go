@@ -64,6 +64,15 @@ func post (w http.ResponseWriter, r * http.Request) {
   w.Write([]byte(hex))
 }
 
+/**
+ * Return the port to listen to according to the PORT env variable, or 3000 by default
+ */
+func port () string {
+  var p string = os.Getenv("PORT")
+  if (p != "") { return ":" + p }
+  return ":3000"
+}
+
 func main () {
   mongo, err := mgo.Dial(os.Getenv("MONGO"))
   if (err != nil) { panic(err) }
@@ -78,5 +87,5 @@ func main () {
     if (r.Method == "POST") { post(w, r) }
   })
 
-  log.Fatal(http.ListenAndServe(":3000", nil))
+  log.Fatal(http.ListenAndServe(port(), nil))
 }
