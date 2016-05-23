@@ -99,6 +99,9 @@ func main () {
   http.HandleFunc("/", func (w http.ResponseWriter, r * http.Request) {
     w.Header().Set("Access-Control-Allow-Origin", "*")
     w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
+    w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+    w.Header().Set("Pragma", "no-cache")
+    w.Header().Set("Expires", "0")
 
     if (r.Method == "GET") { get(w, r) }
     if (r.Method == "POST") { post(w, r) }
